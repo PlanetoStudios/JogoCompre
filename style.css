@@ -1,0 +1,613 @@
+:root{
+  /* Minecraft-inspired palette: grass, dirt, stone, wood */
+  --bg:#7fbf3f;            /* grassy green (used subtly) */
+  --panel:#3b3b2f;         /* dark dirt/stone panel */
+  --card:#2f2b24;          /* darker card surface */
+  --accent:#8ec14a;        /* bright grass accent */
+  --accent2:#b77a3a;       /* wooden / earthy accent */
+  --muted:#cfc6b8;         /* muted parchment */
+  --text:#f2efe7;          /* off-white suitable on dark panels */
+  --red:#d14b4b;           /* rustic red for alerts */
+  --pixel-border:6px;      /* chunkier pixel border for blocky feel */
+  --paper: rgba(0,0,0,0.04);
+  --panel-glow: rgba(142,193,74,0.06);
+  --glass: rgba(255,255,255,0.03);
+  --elev: 10px;
+  --radius:4px;
+  --buy-shadow: 0 8px 0 rgba(0,0,0,0.6);
+  --focus-ring: 0 0 0 6px rgba(142,193,74,0.08);
+}
+
+/* pixel-style webfont is loaded from index.html link for reliable early loading */
+
+/* use Undertale-like font as primary, fallback to Press Start 2P and monospace */
+*{box-sizing:border-box;font-family: "Undertale", "Press Start 2P", "Minecraftia", "Courier New", Courier, monospace}
+body{
+  margin:0;
+  /* pixelated tiled background inspired by Minecraft blocks:
+     subtle grassy tiled pattern using repeating-linear-gradients to feel blocky */
+  background-color: #6aa234;
+  background-image:
+    linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(0,0,0,0.02) 1px, transparent 1px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.015), rgba(0,0,0,0.015) 24px, transparent 24px, transparent 48px);
+  background-size: 24px 24px, 24px 24px, 48px 48px;
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+  /* remove soft glows to favor blocky aesthetic */
+  background-blend-mode:multiply;
+}
+
+/* container: textured like a game GUI panel with earthy border */
+.app{
+  width:920px;
+  max-width:100%;
+  /* Main panel now uses warm brown with darker brown stripe bands for a wood/plank look */
+  background:
+    /* broad brown bands */
+    linear-gradient(180deg,
+      #9b6b3a 0 16%,
+      #8e5d34 16% 28%,
+      #7f4f2b 28% 40%,
+      #6f4223 40% 52%,
+      transparent 52%),
+    /* subtle dark stripe pattern */
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.06) 0 3px, transparent 3px 30px),
+    /* gentle surface highlight */
+    linear-gradient(0deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02)),
+    /* faint vertical grain */
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 4px, transparent 4px 24px);
+  background-size: 100% 64px, 100% 24px, 100% 100%, 100% 48px;
+  background-position: top left, 0 0, 0 0, 0 0;
+  background-repeat: repeat-x, repeat-x, repeat, repeat-x;
+  border:var(--pixel-border) solid rgba(89,240,212,0.08);
+  padding:20px;
+  box-shadow:0 var(--elev) 0 rgba(0,0,0,0.75), 0 0 28px rgba(0,0,0,0.36) inset;
+  border-radius:10px;
+  position:relative;
+  overflow:hidden;
+  transform: translateZ(0);
+}
+.app::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg, rgba(89,240,212,0.03), transparent 40%),
+    repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 2px, transparent 2px 4px);
+  mix-blend-mode:overlay;
+  opacity:0.9;
+}
+
+/* title: blocky with pickaxe icon */
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:10px;border-bottom:4px solid rgba(124,197,118,0.08)}
+h1{
+  font-size:24px;
+  margin:0;
+  font-weight:900;
+  color:var(--text);
+  letter-spacing:0.4px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-family: "Minecraftia", "Courier New", Courier, monospace;
+  position:relative;
+  text-shadow:0 3px 0 rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.35);
+}
+h1::after{
+  content:"";
+  position:absolute;
+  left:36px;
+  right:-6px;
+  bottom:-6px;
+  height:3px;
+  background:linear-gradient(90deg,var(--accent2),var(--accent));
+  opacity:0.7;
+}
+
+/* put a pickaxe before the title (Minecraft vibe) */
+h1#title::before{
+  /* use a pickaxe glyph for Minecraft vibe (keeps pixel font) */
+  content: "⛏";
+  color: var(--accent2);
+  font-size:20px;
+  display:inline-block;
+  transform-origin:center;
+  /* subtle blocky bob instead of soft pulse */
+  animation: pulse 2500ms infinite;
+  filter: none;
+}
+
+@keyframes pulse{
+  0%{ transform: scale(0.96); opacity:0.9; }
+  50%{ transform: scale(1.06); opacity:1; }
+  100%{ transform: scale(0.96); opacity:0.9; }
+}
+
+/* status boxes — blocky UI */
+.status{display:flex;gap:14px;align-items:center}
+.money{
+  background: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(255,255,255,0.00));
+  padding:10px 12px;
+  border:3px solid rgba(0,0,0,0.6);
+  border-radius:6px;
+  min-width:160px;
+  text-align:center;
+  box-shadow: 0 8px 0 rgba(0,0,0,0.65);
+  backdrop-filter: blur(1px);
+  position:relative;
+  overflow:hidden;
+}
+.money::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius:inherit;
+  border:1px solid rgba(0,0,0,0.12);
+  mix-blend-mode:overlay;
+}
+.money .label{font-size:12px;color:var(--muted);letter-spacing:0.4px}
+.money .value{font-size:16px;font-weight:900;margin-top:4px;color:var(--accent);text-shadow:0 1px 0 rgba(0,0,0,0.8)}
+
+/* layout */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 360px;
+  gap:18px;
+}
+.shop{
+  max-height:560px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  background:linear-gradient(180deg, rgba(0,0,0,0.03), rgba(0,0,0,0.15));
+  padding:14px;
+  border-radius:6px;
+  border:3px solid rgba(0,0,0,0.5);
+  box-shadow: inset 0 -6px 20px rgba(0,0,0,0.7);
+  position:relative;
+}
+.shop::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius:inherit;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,0.02) 0 2px, transparent 2px 4px);
+  opacity:0.6;
+}
+.shop.hidden{display:none}
+
+/* shop internal controls (search) */
+.shop .shop-controls{
+  display:flex;gap:8px;align-items:center;margin:8px 0 12px;
+}
+.shop .shop-controls input{
+  flex:1;padding:10px;border-radius:6px;border:2px solid rgba(0,0,0,0.5);background:rgba(0,0,0,0.25);color:var(--text);
+  outline:none;font-size:14px;
+  box-shadow:0 4px 0 rgba(0,0,0,0.6);
+}
+.shop .shop-controls input::placeholder{color:var(--muted)}
+
+/* focus styles for keyboard navigation */
+button,
+input,
+select{
+  outline:none;
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible{
+  box-shadow:var(--focus-ring);
+}
+
+/* category headers */
+.category{margin-bottom:10px}
+.cat-header{
+  display:flex;gap:12px;align-items:center;padding:10px 12px;cursor:pointer;
+  background:linear-gradient(90deg,rgba(0,0,0,0.02),transparent);
+  border-bottom:2px dashed rgba(255,255,255,0.02);
+}
+.cat-icon{font-size:20px}
+.cat-items{
+  padding:10px 6px;
+  background:transparent;
+  display:block;
+  gap:10px;
+  align-items:flex-start;
+}
+
+/* Category tabs: allow horizontal scrolling and touch-dragging on narrow viewports.
+   Make individual tabs inline-flex so they can overflow and be scrolled/drug horizontally.
+   Provide visual affordance (grab cursor) and enable smooth momentum on mobile. */
+#categoryTabs{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  padding-bottom:6px;
+  cursor:default; /* show normal cursor so clicks work reliably */
+  /* avoid scrollbars looking ugly on some platforms */
+}
+#categoryTabs:active{cursor:default;}
+.category-tab{
+  white-space:nowrap;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+  background:#ffffff; /* changed: white button background */
+  color:#071026;        /* dark text for contrast */
+  border-radius:6px;
+  border:2px solid rgba(0,0,0,0.08);
+  min-width:fit-content;
+  flex:0 0 auto;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.15);
+  transition: transform 140ms cubic-bezier(.2,.9,.2,1), box-shadow 140ms, background 120ms, color 120ms;
+}
+
+/* visual state for active tab */
+.category-tab.active{
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  color: #071018;
+  box-shadow: 0 10px 0 rgba(0,0,0,0.2);
+  transform: translateY(-3px);
+}
+
+/* brief pressed animation */
+.category-tab.clicked,
+.category-tab:active{
+  transform: translateY(2px) scale(0.985);
+  box-shadow: 0 3px 0 rgba(0,0,0,0.12);
+  transition: transform 90ms linear, box-shadow 90ms linear;
+}
+#categoryTabs::-webkit-scrollbar{height:10px}
+#categoryTabs::-webkit-scrollbar-thumb{background:rgba(89,240,212,0.12);border-radius:6px}
+
+/* item: blocky card */
+.item{
+  display:inline-flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:space-between;
+  width:320px;
+  min-width:280px;
+  padding:14px;
+  border-radius:6px;
+  background: linear-gradient(180deg, rgba(18,20,36,0.36), rgba(9,10,22,0.48));
+  margin:0 8px 14px 0;
+  border:2px solid rgba(89,240,212,0.06);
+  box-shadow: 0 10px 0 rgba(0,0,0,0.62);
+  transition: transform 120ms cubic-bezier(.2,.9,.2,1), box-shadow 120ms, border-color 120ms;
+  backdrop-filter: blur(1px);
+  position:relative;
+  overflow:hidden;
+}
+.item::before{
+  content:"";
+  position:absolute;
+  left:-40%;
+  top:-40%;
+  width:80%;
+  height:80%;
+  background:radial-gradient(circle at top left, rgba(255,111,181,0.06), transparent 65%);
+  opacity:0;
+  transform:translate3d(0,0,0);
+  transition:opacity 140ms;
+}
+.item:hover{
+  transform: translateY(-6px);
+  box-shadow: 0 18px 0 rgba(0,0,0,0.7);
+  border-color:rgba(89,240,212,0.14);
+}
+.item:hover::before{
+  opacity:1;
+}
+.left{display:flex;gap:14px;align-items:center}
+.icon{
+  width:64px;height:64px;border-radius:8px;
+  background:linear-gradient(180deg, rgba(255,111,181,0.06), rgba(89,240,212,0.04));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:22px;color:#1b2f16;border:2px solid rgba(0,0,0,0.6);
+  box-shadow: inset 0 -6px 18px rgba(0,0,0,0.45);
+}
+.info{min-width:190px}
+.info .name{font-weight:900;margin-bottom:6px;font-size:14px;color:var(--accent)}
+.info .cost{font-size:13px;color:var(--muted)}
+.info .qty{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* buy button: wooden/plank look */
+button.buy{
+  background:linear-gradient(180deg, rgba(255,111,181,0.95), rgba(89,240,212,0.10));
+  color:#f3f6ef;border:none;padding:12px 14px;border-radius:6px;
+  font-weight:900;cursor:pointer;border:3px solid rgba(0,0,0,0.6);
+  box-shadow: 0 8px 0 rgba(0,0,0,0.6), inset 0 -8px 24px rgba(255,111,181,0.03);
+  transition: transform 140ms cubic-bezier(.2,.9,.2,1), box-shadow 140ms, filter 140ms;
+}
+button.buy:hover{transform:translateY(-4px) scale(1.02); box-shadow: 0 20px 0 rgba(0,0,0,0.7); filter:brightness(1.03)}
+button.buy:disabled{opacity:0.5;cursor:not-allowed}
+
+/* small secondary sell button style */
+button.sell{
+  background:transparent;
+  color:var(--muted);
+  border:2px solid rgba(255,255,255,0.04);
+  padding:8px 10px;border-radius:6px;font-weight:800;cursor:pointer;
+}
+button.sell:hover{background:rgba(255,255,255,0.02)}
+
+/* panel (stats) styled like in-game inventory */
+.panel{
+  background:linear-gradient(180deg,#07102a,#0b1530);
+  padding:16px;border-radius:6px;border:3px solid rgba(0,0,0,0.5);
+  height:100%;
+  box-shadow: 0 12px 0 rgba(0,0,0,0.7), 0 0 18px rgba(0,0,0,0.2);
+  position:relative;
+  overflow:hidden;
+}
+.panel::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  border:1px solid rgba(89,240,212,0.02);
+}
+.panel h2{margin:0 0 10px;font-size:16px;color:var(--accent);text-shadow:0 0 5px rgba(0,0,0,0.35)}
+
+/* stat rows */
+.stat{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 10px;
+  background:rgba(0,0,0,0.25);
+  border:2px solid rgba(255,255,255,0.02);
+  border-radius:6px;
+  margin-bottom:8px;
+  font-size:13px;
+}
+
+/* leaderboard styles */
+.leaderboard{
+  margin-top:8px;
+  margin-bottom:10px;
+  background:linear-gradient(180deg, rgba(10,14,32,0.9), rgba(6,8,18,0.9));
+  border-radius:6px;
+  border:2px solid rgba(0,0,0,0.5);
+  padding:8px 10px;
+  max-height:220px;
+  overflow-y:auto;
+  box-shadow: inset 0 -4px 12px rgba(0,0,0,0.6);
+}
+.leaderboard-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+.leaderboard-table th,
+.leaderboard-table td{
+  padding:6px 8px;
+  text-align:left;
+}
+.leaderboard-table th{
+  border-bottom:2px solid rgba(255,255,255,0.02);
+  color:var(--accent);
+}
+.leaderboard-table tr:nth-child(even) td{
+  background:rgba(255,255,255,0.01);
+}
+.leaderboard-empty{
+  font-size:13px;
+  color:var(--muted);
+  padding:8px;
+}
+
+/* admin panel */
+.admin-panel{
+  margin-top:10px;
+  background:linear-gradient(180deg,#0e2b15,#13271a);
+  border-radius:6px;
+  border:2px solid rgba(0,0,0,0.5);
+  padding:10px;
+  font-size:13px;
+  box-shadow: inset 0 -6px 14px rgba(0,0,0,0.6);
+}
+.admin-panel h2{
+  margin:0 0 6px;
+  font-size:16px;
+  color:var(--accent);
+}
+.admin-content div{
+  margin-bottom:6px;
+}
+.admin-actions{
+  margin-top:6px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+/* footer controls */
+.footer{margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn-small{
+  /* dark purple background for shop/settings/admin/footer controls */
+  background:#271733;
+  border:3px solid rgba(0,0,0,0.5);
+  padding:12px 14px;
+  border-radius:6px;
+  color:var(--text);
+  cursor:pointer;
+  font-weight:900;
+  transition: transform 140ms, background 140ms, color 140ms, box-shadow 140ms;
+  min-height:44px;
+  box-shadow:0 6px 0 rgba(0,0,0,0.7);
+}
+.btn-small:hover{
+  /* slightly lighter purple on hover while keeping readable text */
+  background:#3a2350;
+  color:var(--text);
+  transform:translateY(-3px);
+  box-shadow:0 10px 0 rgba(0,0,0,0.75);
+}
+
+/* smaller screens adjustments remain largely unchanged */
+@media (max-width:760px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+  .panel{order:3;margin-top:8px}
+  #shop,
+  #petShop{
+    order:1;
+    width:100%;
+    max-height:50vh;
+  }
+  .app{padding:12px;width:100%}
+}
+
+@media (max-width:420px){
+  :root{
+    --pixel-border:3px;
+    --radius:6px;
+    --elev:10px;
+  }
+
+  .app{
+    padding:10px;
+    border-radius:8px;
+  }
+
+  header{padding-bottom:8px}
+  h1{font-size:18px}
+  h1#title::before{font-size:14px}
+  .status{gap:8px}
+  .money{
+    padding:8px 10px;
+    min-width:120px;
+  }
+  .money .label{font-size:11px}
+  .money .value{font-size:14px}
+
+  .grid{gap:10px}
+  .shop{padding:10px; max-height:48vh}
+  .panel{padding:12px}
+
+  .item{
+    width:260px;
+    min-width:220px;
+    padding:10px;
+    border-radius:6px;
+  }
+  .icon{width:52px;height:52px;font-size:18px;border-radius:6px}
+  .info .name{font-size:14px}
+  .info .cost{font-size:12px}
+  button.buy{padding:10px 12px;font-size:13px}
+  .btn-small{padding:10px 12px;min-height:40px;font-size:13px}
+  .category-tab{padding:6px 8px;font-size:13px}
+
+  .leaderboard{padding:6px}
+  .leaderboard-table th,
+  .leaderboard-table td{padding:6px 6px;font-size:12px}
+
+  .account-card{padding:12px;max-width:320px}
+  .account-title{font-size:18px}
+  .account-label input,
+  .account-label select{padding:8px}
+}
+
+/* custom scrollbar minimal retro */
+.shop::-webkit-scrollbar{width:10px}
+.shop::-webkit-scrollbar-track{background:#0b2a12}
+.shop::-webkit-scrollbar-thumb{background:var(--accent);border-radius:2px}
+
+/* small utility tweaks */
+#toggleShop{
+  border:3px solid rgba(0,0,0,0.5);
+  background:#271733;
+  color:var(--text);
+  font-weight:900;
+  padding:10px 14px;
+  border-radius:6px;
+}
+#toggleShop:hover{
+  background:#3a2350;
+  color:var(--text);
+}
+
+/* Category-specific icon letter colors preserved for visibility */
+.item.cat-clássicos .icon,
+.item.cat-classicos .icon { color: #dfeee1; }
+.item.cat-indies .icon { color: #dfeff4; }
+.item.cat-clickers .icon { color: #f7e7fb; }
+.item.cat-premium .icon { color: #fff7d9; }
+.item.cat-secreto .icon {
+  background: linear-gradient(90deg,#6b8b4a,#8bd37a,#c6e4b2);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* rebirth button styled with earthy red */
+#rebirth{border-color:var(--accent2);background:linear-gradient(180deg,var(--accent2),#ff4f9a);color:#f7fbff;font-weight:900}
+
+/* account overlay */
+.account-overlay{
+  position:fixed;
+  inset:0;
+  background:radial-gradient(800px 400px at 20% 20%, rgba(255,111,181,0.06), transparent 6%), linear-gradient(180deg, rgba(0,0,0,0.88), rgba(0,0,0,0.97));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+.account-overlay.hidden{
+  display:none;
+}
+.account-card{
+  background:linear-gradient(180deg,#0b2a12,#122815);
+  border:var(--pixel-border) solid rgba(0,0,0,0.6);
+  padding:18px 20px;
+  border-radius:8px;
+  width:100%;
+  max-width:360px;
+  box-shadow:0 14px 0 rgba(0,0,0,0.8), 0 0 12px rgba(0,0,0,0.15);
+}
+.account-title{
+  margin:0 0 12px;
+  font-size:16px;
+  color:var(--accent);
+}
+.account-label{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:13px;
+  margin-bottom:12px;
+}
+.account-label input,
+.account-label select{
+  padding:9px 10px;
+  border-radius:6px;
+  border:2px solid rgba(0,0,0,0.5);
+  background:#071509;
+  color:var(--text);
+  outline:none;
+  box-shadow:0 4px 0 rgba(0,0,0,0.7);
+}
+.account-label select{
+  background:#071509;
+}
+.account-submit{
+  width:100%;
+  text-align:center;
+  margin-top:6px;
+  padding:10px 12px;border-radius:6px;background:var(--accent);color:#07210a;border:2px solid #07210a;font-weight:900;
+}
+

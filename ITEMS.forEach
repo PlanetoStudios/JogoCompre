@@ -1,0 +1,7 @@
+// base income for normal units
+total += normalCount * it.income;
+// mutated incomes: gold +25%, diamond +50%, night x2
+total += (muts.gold || 0) * it.income * 1.25;
+total += (muts.diamond || 0) * it.income * 1.5;
+total += (muts.night || 0) * it.income * 2.0;
+

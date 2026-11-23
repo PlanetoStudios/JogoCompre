@@ -1,0 +1,13 @@
+=======
+        <div class=\"cost\">Custo: ${fmt(item.cost)} · Renda: ${fmt(item.income)}/s</div>
+        <div style=\"font-size:13px;color:var(--muted);margin-top:6px\">
+          Quantidade: <span id=\"count-${item.id}\">${owned}</span>
+        </div>
+        <div style=\"font-size:12px;color:var(--muted);margin-top:6px\" id=\"mutations-${item.id}\">
+          <!-- mutation counts will be populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+
+=======
